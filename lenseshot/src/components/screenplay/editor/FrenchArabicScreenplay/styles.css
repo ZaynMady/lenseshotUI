@@ -1,0 +1,82 @@
+/* --- GLOBAL --- */
+.ProseMirror {
+  padding: 3rem 4rem !important;
+  direction: rtl;
+  text-align: right;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* --- TABLEKIT STYLING (The "Invisible" Grid) --- */
+.ProseMirror table.av-script-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Ensures equal 50/50 split */
+  margin: 0;
+  overflow: visible;
+}
+
+/* Hide the default Tiptap table borders */
+.ProseMirror .av-script-cell {
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  
+  /* BORDERLESS LOOK */
+  border: none !important;
+  
+  /* Padding for readability */
+  padding: 0.5rem 1rem;
+}
+
+/* --- COLUMN SPECIFIC STYLING --- */
+
+/* First Column (Right in RTL) = VISUALS */
+/* We target the first cell in every row */
+.ProseMirror .av-script-cell:first-child {
+  border-left: 1px solid #e0e0e0 !important; /* Subtle divider line */
+  width: 50%;
+}
+
+/* Second Column (Left in RTL) = AUDIO */
+.ProseMirror .av-script-cell:nth-child(2) {
+  width: 50%;
+}
+
+/* --- EDITING UX --- */
+/* Show a faint outline only when strictly selecting the table, to help the user */
+.ProseMirror .selectedCell:after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.05);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* --- CONTENT STYLING (Same as before) --- */
+.action { text-align: right; margin: 0; }
+.character { font-weight: bold; text-align: center; margin-top: 0; }
+.dialogue { text-align: center; }
+.parenthetical { font-style: italic; text-align: center; }
+.sound { text-align: right; text-transform: uppercase; text-decoration: underline; font-weight: bold; }
+
+/* --- HEADER NODES (Outside the Table) --- */
+.scene-heading-node {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 2rem;
+  border-bottom: 2px solid black;
+  font-weight: bold;
+}
+.scene-number { order: 1; margin-left: 1rem; }
+.scene-heading-content { order: 2; flex-grow: 1; text-align: left; direction: ltr; }
+
+.scene-location, .transition {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: underline;
+  margin: 1rem 0;
+}

@@ -1,0 +1,113 @@
+/* 1. Editor Setup (CRITICAL) 
+   We need to ensure the main editor has enough padding 
+   so the absolute positioned numbers don't get cut off 
+   or overlap with the browser edge. 
+*/
+.ProseMirror {
+  /* Standard screenplay margins + extra room for the numbers */
+  padding-left: 4rem !important; 
+  padding-right: 4rem !important;
+}
+
+/* 2. The Node View Wrapper 
+   Acts as the anchor for the absolute positioned numbers.
+*/
+.scene-heading-node {
+  position: relative;
+  margin-top: 1.5rem;    /* Standard space before a scene heading */
+  margin-bottom: 1rem;   /* Standard space after */
+}
+
+/* 3. The Editable Text (The Heading Itself) */
+.scene-heading-content {
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1rem; /* 12pt is standard, usually ~1rem */
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Empty state placeholder styling (optional) */
+.scene-heading-content.is-empty::before {
+  content: "INT. LOCATION - TIME";
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+/* 4. Shared Styles for Both Numbers */
+.scene-number {
+  position: absolute;
+  top: 0;
+  width: 3rem;           /* Fixed width to ensure alignment */
+  font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  color: black;           /* Muted color so they don't distract */
+  user-select: none;     /* Prevent users from selecting the number */
+  pointer-events: none;  /* Prevent clicks interfering with cursor placement */
+  white-space: nowrap;
+}
+
+/* 5. Left Number specific positioning 
+   Moves it to the left of the content
+*/
+.scene-number.left {
+  left: -3.5rem; /* Push it into the left padding */
+  text-align: right;
+}
+
+/* 6. Right Number specific positioning 
+   Moves it to the right of the content
+*/
+.scene-number.right {
+  right: -3.5rem; /* Push it into the right padding */
+  text-align: left;
+}
+
+.action {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+
+
+}
+
+/* --- COMPLETED SCREENPLAY ELEMENTS STYLES --- */
+
+/* 1. CHARACTER */
+.character {
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+
+}
+
+/* 2. TRANSITION */
+.transition {
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-transform: uppercase;
+    text-align: right;
+
+}
+
+/* 3. DIALOGUE */
+.dialogue {
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+
+    text-align: center;
+    white-space: pre-wrap;
+    display: block;
+}
+
+/* 4. PARENTHETICAL (Corrected spelling is .parenthetical) */
+.parenthetical {
+    font-size: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-style: italic; 
+    text-align: center;
+}

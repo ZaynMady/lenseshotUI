@@ -1,0 +1,143 @@
+/* --- GLOBAL EDITOR STYLES --- */
+
+.ProseMirror {
+  /* 1. RTL Direction for the whole document */
+  direction: rtl;
+  text-align: right;
+
+  /* 2. Standard screenplay margins + extra room for the numbers */
+  padding-left: 4rem !important; 
+  padding-right: 4rem !important;
+}
+
+/* --- SCENE HEADING (SPLIT LAYOUT) --- */
+
+/* 1. The Container 
+   Uses Flexbox to separate the Number (Right) from the Time/Type (Left).
+   In RTL mode:
+   - "flex-start" is Right.
+   - "flex-end" is Left.
+*/
+/* --- SCENE HEADING (FIXED LAYOUT) --- */
+
+/* 1. The Container */
+.scene-heading-node {
+  display: flex;             /* Use Flexbox */
+  flex-direction: row;       /* Standard row (Starts from Right in RTL) */
+  align-items: center;       /* Align vertically */
+  width: 100%;               /* Force full width */
+  margin-top: 1.5rem;   
+  margin-bottom: 0.5rem; 
+}
+
+/* 2. The Scene Number (Sits on the Right) */
+.scene-number {
+  /* No special positioning needed, it sits at the "Start" (Right) naturally */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  color: black; 
+  user-select: none;     
+  white-space: nowrap;
+  
+  /* Add a gap so it doesn't touch the text if the text gets long */
+  margin-left: 1rem; 
+}
+
+/* 3. The Editable Heading Text (Pushed to the Left) */
+.scene-heading-content {
+  /* CRITICAL FIX: Make this element grow to fill ALL remaining space */
+  flex-grow: 1; 
+  
+  /* CRITICAL FIX: Force the text inside to align to the LEFT */
+  text-align: left; 
+  
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 1rem; 
+  
+  /* Ensure the cursor is visible on the far left immediately */
+  min-width: 50px; 
+}
+
+/* Placeholder styling */
+.scene-heading-content.is-empty::before {
+  content: "داخلي / ليل"; 
+  color: #adb5bd;
+  pointer-events: none;
+  float: left; /* Ensure placeholder sits on the left too */
+}
+
+/* --- SCENE LOCATION (NEW COMPONENT) --- */
+
+.scene-location {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: underline; /* Underlined as per standard */
+  text-align: center;         /* Centered under the heading */
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* Placeholder for Location */
+.scene-location.is-empty::before {
+  content: "اسم المكان (مثال: غرفة المعيشة)";
+  color: #adb5bd;
+  pointer-events: none;
+  display: block; /* Ensure it centers correctly */
+}
+
+/* --- ACTION / DESCRIPTION --- */
+
+.action {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  text-align: right; /* Standard paragraph flow for Arabic */
+  line-height: 1.2;
+}
+
+/* --- CHARACTER --- */
+
+.character {
+  font-size: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  text-align: center; /* Centered in Arabic Script */
+  margin-top: 1rem;
+}
+
+/* --- DIALOGUE --- */
+
+.dialogue {
+  font-size: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center; /* Centered in Arabic Script */
+  white-space: pre-wrap;
+  width: 80%;         /* Optional: Limit width to keep dialogue readable */
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* --- PARENTHETICAL --- */
+
+.parenthetical {
+  font-size: 0.9rem; /* Slightly smaller */
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  margin-bottom: 0px;
+}
+
+/* --- TRANSITION --- */
+
+.transition {
+  font-size: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  
+  /* Your Specific Requirements: */
+  text-align: center;         /* Centered */
+  font-weight: bold;          /* Bold */
+  text-decoration: underline; /* Underlined */
+  
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
