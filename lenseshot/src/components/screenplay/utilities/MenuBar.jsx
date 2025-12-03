@@ -1,26 +1,25 @@
-
-
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   FileText, Save, Download, 
   Undo, Redo, Scissors, Copy, Clipboard,
   Check, Layout, Hash, Eye, 
-  Settings, HelpCircle, Keyboard
+  Settings, HelpCircle, Keyboard,
+  Maximize, Minimize
 } from 'lucide-react';
-
-import { Maximize, Minimize } from 'lucide-react';
 
 export default function MenuBar({ 
   editor, 
-  fileName = "Draft 1.pdf",
+  fileName, // Now passed dynamically from parent
   viewMode, 
   setViewMode, 
   showSceneNumbers, 
   toggleSceneNumbers, 
   onOpenTemplates,
-  isFocusMode,      // <--- New Prop
-  onToggleFocus,    // <--- New Prop
-  onOpenShortcuts
+  isFocusMode,
+  onToggleFocus,
+  onOpenShortcuts,
+  onSave, // New Prop
+  onNew   // New Prop
 }) {
   
   // Helper to run editor commands safely
@@ -38,8 +37,10 @@ export default function MenuBar({
 
       {/* FILE */}
       <MenuDropdown label="File">
-        <MenuItem icon={FileText} label="New Script" onClick={() => console.log('New')} />
-        <MenuItem icon={Save} label="Save Draft" shortcut="Cmd+S" onClick={() => console.log('Save')} />
+        {/* Wire up New and Save to props */}
+        <MenuItem icon={FileText} label="New Script" onClick={onNew} />
+        <MenuItem icon={Save} label="Save Draft" shortcut="Cmd+S" onClick={onSave} />
+        
         <div className="my-1 border-b border-gray-100" />
         <MenuItem icon={Download} label="Export to PDF" onClick={() => console.log('PDF')} />
         <MenuItem icon={Download} label="Export to JSON" onClick={() => console.log('JSON')} />
@@ -50,7 +51,6 @@ export default function MenuBar({
         <MenuItem icon={Undo} label="Undo" shortcut="Cmd+Z" onClick={() => run(ch => ch.undo())} />
         <MenuItem icon={Redo} label="Redo" shortcut="Cmd+Shift+Z" onClick={() => run(ch => ch.redo())} />
         <div className="my-1 border-b border-gray-100" />
-        {/* Note: Browser security often blocks programmatic Cut/Copy/Paste, but we can list them for shortcuts */}
         <MenuItem icon={Scissors} label="Cut" shortcut="Cmd+X" disabled />
         <MenuItem icon={Copy} label="Copy" shortcut="Cmd+C" disabled />
         <MenuItem icon={Clipboard} label="Paste" shortcut="Cmd+V" disabled />
@@ -114,7 +114,7 @@ export default function MenuBar({
       {/* SPACER */}
       <div className="flex-1"></div>
 
-      {/* FILE STATUS */}
+      {/* FILE STATUS (Now Dynamic) */}
       <span className="text-gray-400 italic text-[11px] font-medium">{fileName}</span>
     </div>
   );
@@ -188,4 +188,4 @@ function MenuItem({ onClick, label, icon: Icon, checkable, checked, shortcut, di
         )}
       </button>
     );
-  }
+}

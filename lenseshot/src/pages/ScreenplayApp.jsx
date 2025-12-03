@@ -5,11 +5,17 @@ import ScreenplayEditor from "../components/screenplay/screenplayEditor";
 import ComponentsBar from '../components/screenplay/utilities/componentsBar';
 import MenuBar from '../components/screenplay/utilities/MenuBar';
 import AmericanScreenplay from '../components/screenplay/editor/AmericanScreenplay';
-
-
+// --- NEW IMPORTS ---
+import CreateScreenplayModal from '../components/screenplay/utilities/Menu_bar_components/createScreenplayModal';
+import { api } from '../api/client';
 
 export default function ScreenplayApp() {
   const [template, setTemplate] = useState(AmericanScreenplay)
+  
+  // --- STATE: TRACKING FILE STATUS ---
+  // null = Initialized (New/Unsaved). String = Opened (Existing Name).
+  const [currentFile, setCurrentFile] = useState(null); 
+
   // 1. Default Mappings for Key Combos
   const def_shortcuts = template.shortcuts;
 
@@ -20,12 +26,48 @@ export default function ScreenplayApp() {
   const [shortcuts, setShortcuts] = useState(def_shortcuts);
   const [nodeFlows, setNodeFlows] = useState(def_flows);
   const [isShortcutModalOpen, setIsShortcutModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false); // New Modal State
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [viewMode, setViewMode] = useState('document');
   const [showSceneNumbers, setShowSceneNumbers] = useState(true);
 
+  // --- HANDLER: SAVE LOGIC ---
+  const handleSaveRequest = async () => {
+    if (!editor) return;
 
-  // --- 1. GLOBAL SHORTCUTS HANDLER (Ctrl+Number) ---
+    if (currentFile === null) {
+      // CASE 1: Initialized Screenplay -> Open Modal to Name & Create it
+      setIsCreateModalOpen(true);
+    } else {
+      // CASE 2: Opened Screenplay -> Save directly to backend using existing name
+      try {
+        await api.saveScreenplay(currentFile, editor.getJSON());
+        alert('Draft saved successfully!'); // Replace with toast if available
+      } catch (error) {
+        console.error("Save failed:", error);
+        alert("Failed to save draft.");
+      }
+    }
+  };
+
+  // --- HANDLER: CREATE NEW (RESET) ---
+  const handleNewScreenplay = () => {
+    if (confirm("Are you sure? Unsaved changes will be lost.")) {
+        setCurrentFile(null); // Reset to "Initialized" state
+        editor?.commands.clearContent(); // Clear editor content
+        editor?.commands.focus();
+    }
+  };
+
+  // --- HANDLER: SUCCESSFUL CREATION ---
+  // Called by the modal after api.createScreenplay succeeds
+  const onScreenplayCreated = (newName) => {
+      setCurrentFile(newName); // Switch state to "Opened"
+      setIsCreateModalOpen(false);
+      alert(`Screenplay "${newName}" created successfully!`);
+  };
+
+  // --- 1. GLOBAL SHORTCUTS HANDLER (Ctrl+Number + Save) ---
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
 
@@ -52,7 +94,15 @@ export default function ScreenplayApp() {
           return;
         }
       }
-      // Check for Cmd+Shift+F (Mac) or Ctrl+Shift+F (Windows)
+      
+      // Check for Save Shortcut (Cmd+S / Ctrl+S)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        handleSaveRequest();
+        return;
+      }
+
+      // Check for Focus Mode (Cmd+Shift+F)
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'f') {
         e.preventDefault();
         setIsFocusMode((prev) => !prev);
@@ -67,40 +117,31 @@ export default function ScreenplayApp() {
 
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [editor, shortcuts, isFocusMode]);
+  }, [editor, shortcuts, isFocusMode, currentFile]); // Added currentFile dependency for save logic
 
   // --- 2. DYNAMIC EDITOR FLOW HANDLER (Enter/Tab/Backspace) ---
   useEffect(() => {
       if (!editor || editor.isDestroyed) return;
 
-      // We attach a handler directly to the editor's DOM element for precise interception
-      // Alternatively, we could use a Tiptap extension, but this is easier for React state access
       const handleEditorKeyDown = (view, event) => {
-          
           // A. BACKSPACE LOGIC
           if (event.key === 'Backspace') {
               const { selection } = view.state;
               const { $anchor, empty } = selection;
               
-              // Only trigger if selection is empty (caret) AND the node itself has no content
               if (empty && $anchor.parent.content.size === 0) {
                   const currentNodeName = $anchor.parent.type.name;
 
-                  // Prevent deleting the first node if it's the only one, or handle gracefully
                   if (view.state.doc.childCount <= 1 && $anchor.parent.content.size === 0) {
-                      // Optional: Reset to Scene Heading if it's the only node and empty? 
-                      // For now, let default behavior handle the very first node.
                       return false; 
                   }
 
-                  // Stop default join behavior (which sometimes merges weirdly)
-                  // We want to delete the node entirely and focus the previous one
                   editor.chain()
                       .deleteNode(currentNodeName)
-                      .focus() // Focuses the previous available position
+                      .focus()
                       .run();
                   
-                  return true; // Return true means "event handled", prevent default
+                  return true;
               }
           }
 
@@ -109,49 +150,31 @@ export default function ScreenplayApp() {
               const { $from } = view.state.selection;
               const currentNodeName = $from.parent.type.name;
               
-              // Get configured behavior
               const flow = nodeFlows[currentNodeName];
               
               if (flow) {
                   const targetNode = event.key === 'Enter' ? flow.enter : flow.tab;
                   
                   if (targetNode) {
-                      // TAB: Switch current node type (don't create new line)
                       if (event.key === 'Tab') {
                         event.preventDefault()
                           editor.chain().focus().setNode(targetNode).run();
                           return true; 
                       }
                       
-                      // ENTER: Create new node below (Split Block)
-                      // ... inside your handleEditorKeyDown function ...
-
-// ENTER: Create new node below
-// ENTER: Create new node below
-if (event.key === 'Enter') {
-    // 1. CRITICAL: Stop the browser from inserting a default paragraph
-    event.preventDefault(); 
-
-    // 2. Insert the specific screenplay element
-    editor.commands.insertContent({
-        type: targetNode,
-        // (Optional) content: [] leaves it empty, which is fine
-    });
-
-    return true;
-}
+                      if (event.key === 'Enter') {
+                        event.preventDefault(); 
+                        editor.commands.insertContent({
+                            type: targetNode,
+                        });
+                        return true;
+                    }
                   }
               }
           }
           
-          return false; // Let Tiptap handle other keys
+          return false;
       };
-
-      // Tiptap allows injecting a `handleKeyDown` prop via `setOptions` or `editor.options`
-      // But purely reacting to events via the view prop is cleaner for dynamic updates.
-      // However, to preventDefault effectively, we need to register this prop.
-      // Since we can't easily inject props into an already running editor instance reactively 
-      // without remounting, we'll use the Low-Level ProseMirror `handleKeyDown` prop via `editor.setOptions`.
       
       editor.setOptions({
           editorProps: {
@@ -159,7 +182,6 @@ if (event.key === 'Enter') {
           }
       });
 
-      // Cleanup not strictly necessary as setOptions overwrites, but good practice
       return () => {
           if (!editor.isDestroyed) {
               editor.setOptions({ editorProps: { handleKeyDown: undefined } });
@@ -171,20 +193,23 @@ if (event.key === 'Enter') {
   return (
     <div className="flex flex-col h-full bg-red-50/30 overflow-hidden font-sans">
 
-
-{/* 2. Conditionally Render UI based on Focus Mode */}
+      {/* 2. Conditionally Render UI based on Focus Mode */}
       {!isFocusMode && (
         <>
           <MenuBar 
             editor={editor} 
+            // Pass the current file name or a default placeholder
+            fileName={currentFile || "Untitled Script (Unsaved)"} 
             viewMode={viewMode}
             setViewMode={setViewMode}
             showSceneNumbers={showSceneNumbers}
             toggleSceneNumbers={() => setShowSceneNumbers(!showSceneNumbers)}
-            // Pass the toggle function to the menu too if you want it in "Tools"
             isFocusMode={isFocusMode}
             onToggleFocus={() => setIsFocusMode(!isFocusMode)}
             onTemplate={setTemplate}
+            // Pass Handlers to MenuBar
+            onSave={handleSaveRequest}
+            onNew={handleNewScreenplay}
           />
           <Toolbar editor={editor} onOpenShortcutModal={setIsShortcutModalOpen} />
           <ComponentsBar editor={editor} elements={template.elements} />
@@ -194,14 +219,12 @@ if (event.key === 'Enter') {
       {/* 3. EDITABLE AREA */}
       <div className="flex-1 overflow-hidden relative flex flex-row">
           
-
-
           {/* Editor Canvas */}
           <div 
             className="flex-1 overflow-y-auto bg-stone-100 p-4 md:p-8 flex justify-center cursor-text" 
             onClick={() => editor?.chain().focus().run()}
           >
-                  <ScreenplayEditor setEditorRef={setEditor} template={template} />
+             <ScreenplayEditor setEditorRef={setEditor} template={template} />
           </div>
 
       </div>
@@ -215,6 +238,14 @@ if (event.key === 'Enter') {
         onSaveShortcuts={setShortcuts}
         onSaveFlows={setNodeFlows}
         nodeOptions={template.elements}
+      />
+
+      {/* NEW: Create Screenplay Modal */}
+      <CreateScreenplayModal 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        editorContent={editor?.getJSON()} // Pass current content
+        onSuccess={onScreenplayCreated}
       />
 
     </div>
