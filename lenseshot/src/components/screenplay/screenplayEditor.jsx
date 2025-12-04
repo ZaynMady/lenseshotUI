@@ -12,6 +12,8 @@ export default function ScreenplayEditor({ setEditorRef, template, initialConten
       Pages.configure({
         types: template.elements.map(el => el.node),
         pageFormat: 'A4', 
+        pageBreakBackground: 'transparent',
+        pageGap: 0.5,
       })
     ],
     // 2. Load the content passed from parent (or default to empty)

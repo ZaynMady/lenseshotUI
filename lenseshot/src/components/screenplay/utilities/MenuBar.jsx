@@ -5,7 +5,7 @@ import {
   Check, Layout, Hash, Eye, 
   Settings, HelpCircle, Keyboard,
   Maximize, Minimize, FolderOpen, FilePlus,
-  Upload
+  Upload, Trash2 
 } from 'lucide-react';
 
 export default function MenuBar({ 
@@ -15,7 +15,7 @@ export default function MenuBar({
   setViewMode, 
   showSceneNumbers, 
   toggleSceneNumbers, 
-  onOpenTemplates,
+  onOpenTemplates, // <--- Prop used for the Format menu item
   isFocusMode,
   onToggleFocus,
   onOpenShortcuts,
@@ -24,12 +24,15 @@ export default function MenuBar({
   onNew,   
   onOpen,
   onImport,
-  onExport // New Prop
+  onExport,
+  onDelete 
 }) {
   
   const run = (cb) => {
     if (editor) cb(editor.chain().focus()).run();
   };
+
+  const isUnsaved = !fileName || fileName.includes("Unsaved");
 
   return (
     <div className="h-8 bg-white border-b border-red-100 flex items-center px-4 gap-2 text-xs select-none flex-none text-gray-600 relative z-50">
@@ -48,9 +51,18 @@ export default function MenuBar({
         <div className="my-1 border-b border-gray-100" />
         
         <MenuItem icon={Upload} label="Import..." shortcut="Cmd+I" onClick={onImport} />
-        
-        {/* EXPORT ITEM */}
         <MenuItem icon={Download} label="Export..." shortcut="Cmd+E" onClick={onExport} />
+
+        <div className="my-1 border-b border-gray-100" />
+
+        <MenuItem 
+            icon={Trash2} 
+            label="Delete" 
+            onClick={onDelete} 
+            disabled={isUnsaved} 
+            className="text-red-600 hover:bg-red-50" 
+        />
+
       </MenuDropdown>
 
       {/* EDIT */}
@@ -98,7 +110,10 @@ export default function MenuBar({
             checked={showSceneNumbers} 
             onClick={toggleSceneNumbers} 
         />
+        
         <div className="my-1 border-b border-gray-100" />
+        
+        {/* --- HERE IT IS --- */}
         <MenuItem 
             label="Change Template..." 
             icon={Layout} 
@@ -166,7 +181,7 @@ function MenuDropdown({ label, children }) {
   );
 }
 
-function MenuItem({ onClick, label, icon: Icon, checkable, checked, shortcut, disabled }) {
+function MenuItem({ onClick, label, icon: Icon, checkable, checked, shortcut, disabled, className }) {
     return (
       <button
         onClick={() => {
@@ -176,6 +191,7 @@ function MenuItem({ onClick, label, icon: Icon, checkable, checked, shortcut, di
         className={`
             text-left px-3 py-1.5 text-xs flex items-center gap-2 w-full
             ${disabled ? 'opacity-50 cursor-default' : 'hover:bg-red-50 hover:text-red-900 text-gray-700'}
+            ${className || ''}
         `}
       >
         <div className="w-4 h-4 flex items-center justify-center flex-none text-red-500">
