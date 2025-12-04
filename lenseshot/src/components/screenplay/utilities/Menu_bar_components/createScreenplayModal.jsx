@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../../../../api/client'; 
 
-export default function CreateScreenplayModal({ isOpen, onClose, editorContent, onSuccess }) {
+export default function CreateScreenplayModal({ isOpen, onClose, editorContent, templateId, onSuccess }) {
     const [scriptName, setScriptName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -10,18 +10,23 @@ export default function CreateScreenplayModal({ isOpen, onClose, editorContent, 
         
         setIsLoading(true);
         try {
-            // 1. Prepare Content
-            // If editorContent is empty/null, we can send a basic default or the actual empty doc
-            const contentToSave = editorContent || { type: 'doc', content: [] };
-
-            // 2. Call Backend Create Endpoint
-            // We append .lss if not present, though your backend might handle it
-            const finalName = scriptName.endsWith('.lss') ? scriptName : `${scriptName}.lss`;
-
-            await api.createScreenplay(finalName, contentToSave);
+            // 1. Prepare Content Wrapper
+            // We wrap the raw Tiptap JSON with metadata about the template
+            const rawContent = editorContent || { type: 'doc', content: [] };
             
-            // 3. Success Callback (Updates parent state to "Opened")
-            if (onSuccess) onSuccess(finalName);
+            const filePayload = {
+                meta: {
+                    templateId: templateId || 'american', // Default if missing
+                    version: '1.0'
+                },
+                content: rawContent
+            };
+
+            // 2. Call Backend
+            await api.createScreenplay(scriptName, filePayload);
+            
+            // 3. Success Callback
+            if (onSuccess) onSuccess(scriptName);
             
         } catch (error) {
             console.error("Create failed", error);
@@ -36,8 +41,8 @@ export default function CreateScreenplayModal({ isOpen, onClose, editorContent, 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] backdrop-blur-sm">
             <div className="bg-white p-6 rounded-xl shadow-2xl w-96 border border-gray-100">
-                <h2 className="text-lg font-bold mb-1 text-gray-800">Save New Screenplay</h2>
-                <p className="text-xs text-gray-500 mb-4">Give your screenplay a name to save it to your cloud storage.</p>
+                <h2 className="text-lg font-bold mb-1 text-gray-800">Save Screenplay</h2>
+                <p className="text-xs text-gray-500 mb-4">Enter a name to save this version.</p>
                 
                 <div className="space-y-4">
                     <div>
@@ -65,7 +70,7 @@ export default function CreateScreenplayModal({ isOpen, onClose, editorContent, 
                             disabled={isLoading}
                             className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
                         >
-                            {isLoading ? 'Creating...' : 'Save & Create'}
+                            {isLoading ? 'Saving...' : 'Save As'}
                         </button>
                     </div>
                 </div>

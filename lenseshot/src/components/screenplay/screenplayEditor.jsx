@@ -1,35 +1,30 @@
 import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Document from '@tiptap/extension-document';
-import { Pages } from '@tiptap-pro/extension-pages'; // Assuming you have pro
+import { Pages } from '@tiptap-pro/extension-pages';
 import { useEffect } from 'react';
 
-export default function ScreenplayEditor({ setEditorRef, template }) {
+export default function ScreenplayEditor({ setEditorRef, template, initialContent }) {
 
   // 1. Initialize Editor with Template Logic
   const editor = useEditor({
-
-
     extensions: [
-      
       ...template.extension,
-
-      // D. Page Layout (Pro)
+      // Page Layout Configuration
       Pages.configure({
-        types: template.elements.map(el => el.node), // Dynamically get valid nodes
+        types: template.elements.map(el => el.node),
         pageFormat: 'A4', 
       })
     ],
-    content: "", 
+    // 2. Load the content passed from parent (or default to empty)
+    content: initialContent || "", 
     editorProps: {
       attributes: {
-        // Add the Template ID as a class for CSS scoping (e.g., .tpl-american)
-        class: 'focus:outline-none h-full outline-none prose max-w-none' 
+        // Scoped class for CSS (e.g., .tpl-american)
+        class: `focus:outline-none h-full outline-none prose max-w-none tpl-${template.id}`
       },
     },
-  }, [template.id]); // <--- CRITICAL: Re-create editor when template ID changes
+  }, [template.id]); // Re-create when template ID changes
 
-  // 2. Sync Editor to Parent
+  // 3. Sync Editor to Parent
   useEffect(() => {
      if (editor && !editor.isDestroyed) {
          setEditorRef(editor);

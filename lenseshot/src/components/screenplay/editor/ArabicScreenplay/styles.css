@@ -1,6 +1,6 @@
 /* --- GLOBAL EDITOR STYLES --- */
 
-.ProseMirror {
+.tpl_arabic {
   /* 1. RTL Direction for the whole document */
   direction: rtl;
   text-align: right;
@@ -21,7 +21,7 @@
 /* --- SCENE HEADING (FIXED LAYOUT) --- */
 
 /* 1. The Container */
-.scene-heading-node {
+.tpl-arabic .scene-heading-node {
   display: flex;             /* Use Flexbox */
   flex-direction: row;       /* Standard row (Starts from Right in RTL) */
   align-items: center;       /* Align vertically */
@@ -31,7 +31,7 @@
 }
 
 /* 2. The Scene Number (Sits on the Right) */
-.scene-number {
+.tpl-arabic .scene-number {
   /* No special positioning needed, it sits at the "Start" (Right) naturally */
   font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
@@ -44,7 +44,7 @@
 }
 
 /* 3. The Editable Heading Text (Pushed to the Left) */
-.scene-heading-content {
+.tpl-arabic .scene-heading-content {
   /* CRITICAL FIX: Make this element grow to fill ALL remaining space */
   flex-grow: 1; 
   
@@ -60,7 +60,7 @@
 }
 
 /* Placeholder styling */
-.scene-heading-content.is-empty::before {
+.tpl-arabic .scene-heading-content.is-empty::before {
   content: "داخلي / ليل"; 
   color: #adb5bd;
   pointer-events: none;
@@ -69,7 +69,7 @@
 
 /* --- SCENE LOCATION (NEW COMPONENT) --- */
 
-.scene-location {
+.tpl-arabic .scene-location {
   font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
   font-weight: bold;
@@ -80,7 +80,7 @@
 }
 
 /* Placeholder for Location */
-.scene-location.is-empty::before {
+.tpl-arabic .scene-location.is-empty::before {
   content: "اسم المكان (مثال: غرفة المعيشة)";
   color: #adb5bd;
   pointer-events: none;
@@ -89,7 +89,7 @@
 
 /* --- ACTION / DESCRIPTION --- */
 
-.action {
+.tpl-arabic .action {
   font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
   text-align: right; /* Standard paragraph flow for Arabic */
@@ -98,7 +98,7 @@
 
 /* --- CHARACTER --- */
 
-.character {
+.tpl-arabic .character {
   font-size: 1rem;
   font-family: 'Courier New', Courier, monospace;
   font-weight: bold;
@@ -108,7 +108,7 @@
 
 /* --- DIALOGUE --- */
 
-.dialogue {
+.tpl-arabic .dialogue {
   font-size: 1rem;
   font-family: 'Courier New', Courier, monospace;
   text-align: center; /* Centered in Arabic Script */
@@ -129,7 +129,7 @@
 
 /* --- TRANSITION --- */
 
-.transition {
+.tpl-arabic .transition {
   font-size: 1rem;
   font-family: 'Courier New', Courier, monospace;
   

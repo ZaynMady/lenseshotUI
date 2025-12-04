@@ -3,7 +3,7 @@
    so the absolute positioned numbers don't get cut off 
    or overlap with the browser edge. 
 */
-.ProseMirror {
+.tpl-american {
   /* Standard screenplay margins + extra room for the numbers */
   padding-left: 4rem !important; 
   padding-right: 4rem !important;
@@ -12,14 +12,14 @@
 /* 2. The Node View Wrapper 
    Acts as the anchor for the absolute positioned numbers.
 */
-.scene-heading-node {
+.tpl-american .scene-heading-node {
   position: relative;
   margin-top: 1.5rem;    /* Standard space before a scene heading */
   margin-bottom: 1rem;   /* Standard space after */
 }
 
 /* 3. The Editable Text (The Heading Itself) */
-.scene-heading-content {
+.tpl-american .scene-heading-content {
   font-family: 'Courier Prime', 'Courier New', Courier, monospace;
   font-weight: bold;
   text-transform: uppercase;
@@ -29,7 +29,7 @@
 }
 
 /* Empty state placeholder styling (optional) */
-.scene-heading-content.is-empty::before {
+.tpl-american .scene-heading-content.is-empty::before {
   content: "INT. LOCATION - TIME";
   float: left;
   color: #adb5bd;
@@ -38,7 +38,7 @@
 }
 
 /* 4. Shared Styles for Both Numbers */
-.scene-number {
+.tpl-american .scene-number {
   position: absolute;
   top: 0;
   width: 3rem;           /* Fixed width to ensure alignment */
@@ -53,7 +53,7 @@
 /* 5. Left Number specific positioning 
    Moves it to the left of the content
 */
-.scene-number.left {
+.tpl-american .scene-number.left {
   left: -3.5rem; /* Push it into the left padding */
   text-align: right;
 }
@@ -61,12 +61,12 @@
 /* 6. Right Number specific positioning 
    Moves it to the right of the content
 */
-.scene-number.right {
+.tpl-american .scene-number.right {
   right: -3.5rem; /* Push it into the right padding */
   text-align: left;
 }
 
-.action {
+.tpl-american .action {
     font-family: 'Courier New', Courier, monospace;
     font-size: 1rem;
 
@@ -76,7 +76,7 @@
 /* --- COMPLETED SCREENPLAY ELEMENTS STYLES --- */
 
 /* 1. CHARACTER */
-.character {
+.tpl-american .character {
     font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
@@ -86,7 +86,7 @@
 }
 
 /* 2. TRANSITION */
-.transition {
+.tpl-american .transition {
     font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
     text-transform: uppercase;
@@ -95,7 +95,7 @@
 }
 
 /* 3. DIALOGUE */
-.dialogue {
+.tpl-american .dialogue {
     font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
 
@@ -105,7 +105,7 @@
 }
 
 /* 4. PARENTHETICAL (Corrected spelling is .parenthetical) */
-.parenthetical {
+.tpl-american .parenthetical {
     font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
     font-style: italic; 

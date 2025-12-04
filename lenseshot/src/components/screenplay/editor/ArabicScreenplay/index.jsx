@@ -166,7 +166,7 @@ const ArabicScreenplayExtension = [ Action, SceneHeading, SceneLocation, Charact
 // --- 5. EXPORT ---
 
 export default {
- id: 'arabic_v2',
+ id: 'arabic',
  name: 'Arabic Screenplay (Split)',
  extension: ArabicScreenplayExtension,
  elements: [
