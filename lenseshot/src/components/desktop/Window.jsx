@@ -1,34 +1,55 @@
-// src/components/desktop/Window.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Draggable from 'react-draggable';
 import { Resizable } from 're-resizable';
 import { X, Minus, Square, Maximize2 } from 'lucide-react';
 
-export default function Window({ title, onClose, onMinimize, children }) {
+export default function Window({ 
+  title, 
+  onClose, 
+  onMinimize, 
+  onFocus, 
+  zIndex, 
+  isMinimized, 
+  children 
+}) {
   const [isMaximized, setIsMaximized] = useState(false);
-  const nodeRef = useRef(null); // Ref for the draggable element
+  const nodeRef = useRef(null); 
 
   const toggleMaximize = () => setIsMaximized(!isMaximized);
+
+  // Focus window on mount
+  useEffect(() => {
+    if (onFocus) onFocus();
+  }, []);
 
   return (
     <Draggable
       nodeRef={nodeRef}
-      handle=".window-handle" // Drag only from title bar
-      disabled={isMaximized}  // Disable drag when full screen
-      position={isMaximized ? { x: 0, y: 0 } : undefined} // Force top-left when maximized
-      // We set a default position so it doesn't spawn off-screen
+      handle=".window-handle"
+      disabled={isMaximized}
+      position={isMaximized ? { x: 0, y: 0 } : undefined}
       defaultPosition={{x: 100, y: 50}}
+      // Pass focus event when dragging starts
+      onStart={onFocus}
     >
-      {/* 1. THE DRAGGABLE WRAPPER (Catches the x/y transform) */}
+      {/* WRAPPER DIV:
+          1. Controls zIndex (Stacking order)
+          2. Controls Visibility (Display: none when minimized to keep state alive) 
+      */}
       <div 
         ref={nodeRef} 
-        className={`absolute z-40 flex flex-col ${isMaximized ? 'inset-0 w-full h-full !transform-none' : ''}`}
-        // If maximized, we force fixed positioning to cover the screen
-        style={isMaximized ? { position: 'fixed', top: 0, left: 0 } : { position: 'absolute' }} 
+        onMouseDownCapture={onFocus} // Bring to front on click
+        className={`absolute flex flex-col ${isMaximized ? 'inset-0 w-full h-full !transform-none' : ''}`}
+        style={{ 
+            position: isMaximized ? 'fixed' : 'absolute', 
+            top: isMaximized ? 0 : undefined, 
+            left: isMaximized ? 0 : undefined,
+            zIndex: zIndex,
+            display: isMinimized ? 'none' : 'flex' 
+        }} 
       >
         
-        {/* 2. THE ANIMATION WRAPPER (Catches the scale/opacity) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -37,14 +58,13 @@ export default function Window({ title, onClose, onMinimize, children }) {
           className="flex flex-col h-full shadow-2xl rounded-lg overflow-hidden bg-white border border-gray-300"
         >
           
-          {/* 3. THE RESIZABLE WRAPPER */}
           <Resizable
             size={isMaximized ? { width: '100vw', height: '100vh' } : undefined}
-            defaultSize={{ width: 800, height: 600 }}
+            defaultSize={{ width: 900, height: 650 }}
             minWidth={320}
             minHeight={200}
-            enable={isMaximized ? false : undefined} // Disable resize handles when maximized
-            className="flex flex-col"
+            enable={isMaximized ? false : undefined} 
+            className="flex flex-col h-full" // Ensure it takes full height
           >
               
               {/* --- TITLE BAR --- */}
@@ -70,7 +90,7 @@ export default function Window({ title, onClose, onMinimize, children }) {
               </div>
 
               {/* --- APP CONTENT --- */}
-              <div className="flex-1 overflow-hidden relative bg-gray-50">
+              <div className="flex-1 overflow-hidden relative bg-gray-50 flex flex-col">
                 {children}
               </div>
 
