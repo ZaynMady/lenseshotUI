@@ -32,6 +32,14 @@ export default function ScreenplayEditor({ setEditorRef, template, initialConten
      return () => setEditorRef(null);
   }, [editor, setEditorRef]);
 
+  useEffect(() => {
+    if (editor && initialContent && !editor.isDestroyed) {
+      // When initialContent changes (e.g., opening a new file), 
+      // we force the editor to swap its content.
+      editor.commands.setContent(initialContent);
+    }
+  }, [initialContent, editor]);
+
   if (!editor) {
     return <div className="p-8 text-gray-400 animate-pulse">Loading Script Engine...</div>
   }
