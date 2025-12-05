@@ -11,7 +11,11 @@ export default function TaskbarIcon ({ icon, isActive, onClick }) {
     </div>
     {/* Active Dot Indicator */}
     {isActive && (
-      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 size-1 bg-blue-400 rounded-full shadow-[0_0_8px_rgba(96,165,250,0.8)]"></div>
+      <div 
+        data-testid="active-indicator"
+        className="absolute bottom-1 left-1/2 -translate-x-1/2 size-1 bg-blue-400 rounded-full shadow-[0_0_8px_rgba(96,165,250,0.8)]"
+      >
+      </div>
     )}
   </button>
   )

@@ -4,24 +4,52 @@ import { Download, FileText, X, FileType, Printer } from 'lucide-react';
 export default function ExportScreenplayModal({ isOpen, onClose, onExport, defaultName }) {
     const [fileName, setFileName] = useState(defaultName || 'Untitled Script');
 
-    // Update local state when prop changes
+    // Update local state when prop changes, stripping extensions
     useEffect(() => {
-        if (defaultName) setFileName(defaultName.replace(/\.(lss|json|doc|pdf)$/i, ''));
+        if (defaultName) {
+            setFileName(defaultName.replace(/\.(lss|json|doc|pdf|docx)$/i, ''));
+        }
     }, [defaultName, isOpen]);
+
+    // Handle Enter key to trigger default export (LSS)
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            onExport('lss', fileName);
+            onClose();
+        }
+        if (e.key === 'Escape') {
+            onClose();
+        }
+    };
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="export-modal-title"
+        >
+            {/* Backdrop click to close */}
+            <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
+
+            <div 
+                className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-100 overflow-hidden relative z-10 animate-in fade-in zoom-in duration-200"
+                onKeyDown={handleKeyDown}
+            >
                 
                 {/* Header */}
                 <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <h2 id="export-modal-title" className="text-lg font-bold text-gray-800 flex items-center gap-2">
                         <Download size={20} className="text-red-500" />
                         Export Screenplay
                     </h2>
-                    <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded-full text-gray-500 transition-colors">
+                    <button 
+                        onClick={onClose} 
+                        className="p-1 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                        aria-label="Close export modal"
+                    >
                         <X size={18} />
                     </button>
                 </div>
@@ -30,9 +58,16 @@ export default function ExportScreenplayModal({ isOpen, onClose, onExport, defau
                     
                     {/* Filename Input */}
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Filename</label>
+                        <label 
+                            htmlFor="export-filename" 
+                            className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
+                        >
+                            Filename
+                        </label>
                         <input 
+                            id="export-filename"
                             type="text" 
+                            autoFocus
                             className="w-full border border-gray-300 p-2.5 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium text-gray-700" 
                             value={fileName}
                             onChange={(e) => setFileName(e.target.value)}
@@ -42,13 +77,14 @@ export default function ExportScreenplayModal({ isOpen, onClose, onExport, defau
 
                     {/* Export Options */}
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Select Format</label>
+                        <span className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Select Format</span>
                         <div className="grid grid-cols-1 gap-3">
                             
                             {/* Option 1: LSS (Project File) */}
                             <button 
                                 onClick={() => { onExport('lss', fileName); onClose(); }}
                                 className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all group text-left"
+                                aria-label="Export as Lenseshot Script"
                             >
                                 <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <FileText size={20} />
@@ -63,6 +99,7 @@ export default function ExportScreenplayModal({ isOpen, onClose, onExport, defau
                             <button 
                                 onClick={() => { onExport('pdf', fileName); onClose(); }}
                                 className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all group text-left"
+                                aria-label="Export as PDF"
                             >
                                 <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <Printer size={20} />
@@ -77,6 +114,7 @@ export default function ExportScreenplayModal({ isOpen, onClose, onExport, defau
                             <button 
                                 onClick={() => { onExport('docx', fileName); onClose(); }}
                                 className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all group text-left"
+                                aria-label="Export as Word Document"
                             >
                                 <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <FileType size={20} />

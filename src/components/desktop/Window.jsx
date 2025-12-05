@@ -30,16 +30,14 @@ export default function Window({
       disabled={isMaximized}
       position={isMaximized ? { x: 0, y: 0 } : undefined}
       defaultPosition={{x: 100, y: 50}}
-      // Pass focus event when dragging starts
       onStart={onFocus}
     >
-      {/* WRAPPER DIV:
-          1. Controls zIndex (Stacking order)
-          2. Controls Visibility (Display: none when minimized to keep state alive) 
+      {/* WRAPPER DIV 
+         changed onMouseDownCapture -> onMouseDown to allow children to stopPropagation
       */}
       <div 
         ref={nodeRef} 
-        onMouseDownCapture={onFocus} // Bring to front on click
+        onMouseDown={onFocus} 
         className={`absolute flex flex-col ${isMaximized ? 'inset-0 w-full h-full !transform-none' : ''}`}
         style={{ 
             position: isMaximized ? 'fixed' : 'absolute', 
@@ -64,7 +62,7 @@ export default function Window({
             minWidth={320}
             minHeight={200}
             enable={isMaximized ? false : undefined} 
-            className="flex flex-col h-full" // Ensure it takes full height
+            className="flex flex-col h-full"
           >
               
               {/* --- TITLE BAR --- */}
@@ -76,14 +74,33 @@ export default function Window({
                    <span className="text-sm font-semibold text-gray-700">{title}</span>
                 </div>
 
-                <div className="flex items-center gap-2" onPointerDownCapture={e => e.stopPropagation()}>
-                  <button onClick={onMinimize} className="p-1 hover:bg-gray-200 rounded text-gray-500">
+                <div 
+                  className="flex items-center gap-2" 
+                  onPointerDownCapture={e => e.stopPropagation()}
+                  onMouseDown={e => e.stopPropagation()}
+                >
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onMinimize(); }} 
+                    className="p-1 hover:bg-gray-200 rounded text-gray-500" 
+                    aria-label='minimize' 
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
                     <Minus size={14} />
                   </button>
-                  <button onClick={toggleMaximize} className="p-1 hover:bg-gray-200 rounded text-gray-500">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); toggleMaximize(); }} 
+                    className="p-1 hover:bg-gray-200 rounded text-gray-500" 
+                    aria-label='maximize' 
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
                     {isMaximized ? <Maximize2 size={14} /> : <Square size={14} />}
                   </button>
-                  <button onClick={onClose} className="p-1 hover:bg-red-500 hover:text-white rounded text-gray-500">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onClose(); }} 
+                    className="p-1 hover:bg-red-500 hover:text-white rounded text-gray-500" 
+                    aria-label='close' 
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
                     <X size={14} />
                   </button>
                 </div>

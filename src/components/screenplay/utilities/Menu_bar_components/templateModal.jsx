@@ -6,16 +6,25 @@ export default function TemplateModal({ isOpen, onClose, currentTemplateId, onSe
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="template-modal-title"
+        >
             <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
                 
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <h2 id="template-modal-title" className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         <Layout size={22} className="text-red-500" />
                         Choose Template
                     </h2>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-colors">
+                    <button 
+                        onClick={onClose} 
+                        className="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-colors"
+                        aria-label="Close template modal"
+                    >
                         <X size={20} />
                     </button>
                 </div>
@@ -23,7 +32,7 @@ export default function TemplateModal({ isOpen, onClose, currentTemplateId, onSe
                 {/* Template Grid */}
                 <div className="p-6 bg-gray-50/50 max-h-[60vh] overflow-y-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {templates.map((tpl) => {
+                        {templates && templates.map((tpl) => {
                             const isActive = currentTemplateId === tpl.id;
                             return (
                                 <button
@@ -36,6 +45,7 @@ export default function TemplateModal({ isOpen, onClose, currentTemplateId, onSe
                                             : 'border-gray-200 bg-white hover:border-red-200 hover:shadow-lg'
                                         }
                                     `}
+                                    aria-pressed={isActive}
                                 >
                                     {/* Active Badge */}
                                     {isActive && (

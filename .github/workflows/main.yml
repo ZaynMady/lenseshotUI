@@ -1,0 +1,21 @@
+name: Production Gatekeeper
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install Deps
+        run: npm ci
+        continue-on-error: true # Don't block yet if you have bad types
+      - name: Run Tests
+        run: npm test

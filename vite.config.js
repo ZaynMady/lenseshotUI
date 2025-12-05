@@ -11,5 +11,11 @@ export default defineConfig({
       react: path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
+
+  },
+  test: {
+    globals: true,           // <--- FIXES 'describe is not defined'
+    environment: 'jsdom', 
+    setupFiles: './src/setupTests.js',   // <--- FIXES 'document is not defined
   },
 })

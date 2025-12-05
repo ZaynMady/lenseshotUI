@@ -57,7 +57,7 @@ export default function ShortcutModal({ isOpen, onClose, shortcuts, flows, onSav
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog" aria-modal="true">
       <div className="bg-white rounded-xl shadow-2xl w-[600px] overflow-hidden border border-red-100 flex flex-col max-h-[90vh]">
         
         {/* Header */}
@@ -66,7 +66,7 @@ export default function ShortcutModal({ isOpen, onClose, shortcuts, flows, onSav
             <Keyboard size={18} />
             <span>Editor Configuration</span>
           </div>
-          <button onClick={onClose} className="text-red-100 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-red-100 hover:text-white transition-colors" aria-label="Close modal">
             <X size={18} />
           </button>
         </div>
@@ -94,9 +94,7 @@ export default function ShortcutModal({ isOpen, onClose, shortcuts, flows, onSav
           {activeTab === 'shortcuts' && (
               <div className="space-y-3">
                 <p className="text-xs text-gray-500 mb-4">Click a button to record a new shortcut for creating elements.</p>
-                {/* FIX: Also switched this to map nodeOptions to ensure we only show valid shortcuts 
-                   If shortcuts object has extra keys, they won't show. If that's undesired, revert to Object.entries(tempShortcuts)
-                */}
+                
                 {Object.entries(tempShortcuts).map(([action, keys]) => (
                     <div key={action} className="flex items-center justify-between group p-2 hover:bg-gray-50 rounded">
                     <span className="text-sm font-medium text-gray-700 capitalize">
@@ -105,6 +103,7 @@ export default function ShortcutModal({ isOpen, onClose, shortcuts, flows, onSav
                     </span>
                     <button
                         onClick={() => setListeningKey(action)}
+                        aria-label={`Record shortcut for ${action}`}
                         className={`px-3 py-1.5 text-xs font-mono rounded border transition-all min-w-[120px] text-center
                         ${listeningKey === action 
                             ? 'bg-red-500 text-white border-red-600 animate-pulse' 
@@ -148,6 +147,7 @@ export default function ShortcutModal({ isOpen, onClose, shortcuts, flows, onSav
                             
                             {/* Enter Select */}
                             <select 
+                                aria-label={`Enter behavior for ${label}`}
                                 value={behavior.enter}
                                 onChange={(e) => handleFlowChange(nodeKey, 'enter', e.target.value)}
                                 className="text-xs border border-gray-300 rounded p-1.5 bg-white focus:ring-2 focus:ring-red-200 outline-none cursor-pointer"
@@ -160,6 +160,7 @@ export default function ShortcutModal({ isOpen, onClose, shortcuts, flows, onSav
 
                             {/* Tab Select */}
                             <select 
+                                aria-label={`Tab behavior for ${label}`}
                                 value={behavior.tab}
                                 onChange={(e) => handleFlowChange(nodeKey, 'tab', e.target.value)}
                                 className="text-xs border border-gray-300 rounded p-1.5 bg-white focus:ring-2 focus:ring-red-200 outline-none cursor-pointer"

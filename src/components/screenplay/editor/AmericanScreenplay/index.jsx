@@ -109,6 +109,7 @@ const Action = StarterKit.configure({
         HTMLAttributes: {
             class: 'action', 
         },
+        
     },
     heading: false 
 })

@@ -1,13 +1,24 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import { Pages } from '@tiptap-pro/extension-pages';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { getCommonExtensions } from './editor/commonExtension';
 
 export default function ScreenplayEditor({ setEditorRef, template, initialContent }) {
 
-  // 1. Initialize Editor with Template Logic
-  const editor = useEditor({
-    extensions: [
-      ...template.extension,
+  // 1. Calculate Extensions dynamically
+  const extensions = useMemo(() => {
+    // Get the list of node names from the template (e.g., 'character', 'dialogue')
+    // so we can tell TextAlign to work on them.
+    const templateNodeNames = template.elements 
+      ? template.elements.map(el => el.node)
+      : [];
+
+    const common = getCommonExtensions(templateNodeNames);
+    
+    return [
+      ...common,           // Load standard formatting tools
+      ...template.extension, // Load template-specific nodes (SceneHeading, etc.)
+      
       // Page Layout Configuration
       Pages.configure({
         types: template.elements.map(el => el.node),
@@ -15,16 +26,19 @@ export default function ScreenplayEditor({ setEditorRef, template, initialConten
         pageBreakBackground: 'transparent',
         pageGap: 0.5,
       })
-    ],
-    // 2. Load the content passed from parent (or default to empty)
+    ];
+  }, [template]); // Re-calculate if template changes
+
+  // 2. Initialize Editor
+  const editor = useEditor({
+    extensions: extensions,
     content: initialContent || "", 
     editorProps: {
       attributes: {
-        // Scoped class for CSS (e.g., .tpl-american)
         class: `focus:outline-none h-full outline-none prose max-w-none tpl-${template.id}`
       },
     },
-  }, [template.id]); // Re-create when template ID changes
+  }, [template.id]); // Re-create editor instance if template ID changes
 
   // 3. Sync Editor to Parent
   useEffect(() => {
@@ -36,8 +50,6 @@ export default function ScreenplayEditor({ setEditorRef, template, initialConten
 
   useEffect(() => {
     if (editor && initialContent && !editor.isDestroyed) {
-      // When initialContent changes (e.g., opening a new file), 
-      // we force the editor to swap its content.
       editor.commands.setContent(initialContent);
     }
   }, [initialContent, editor]);
